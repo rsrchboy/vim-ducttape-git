@@ -1,0 +1,70 @@
+sudo: true
+language: C
+addons:
+  apt:
+    sources:
+      # for a newer libgit2
+      - sourceline: 'ppa:jonathonf/rustlang'
+        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x8CF63AD3F06FC659'
+    packages:
+      - vim-nox
+      - libio-socket-ssl-perl
+      - libperl-dev
+      # for p5-Git-Raw
+      - libgit2-dev
+      - libssh2-1-dev
+      - libcapture-tiny-perl
+      - libdevel-checklib-perl
+      - libextutils-pkgconfig-perl
+      - libfile-chdir-perl
+      - libgit-repository-perl
+      - libpath-tiny-perl
+      - libtest-pod-coverage-perl
+      - libtest-pod-perl
+      - libtest-simple-perl
+
+# NB: We build against several versions of vim.  One we know is the minimum
+# where everything works, two where we'd like them to work (because of what
+# stock Ubuntu/16.04 is at), and a couple PPA's containing newer vim that
+# serve as a sanity check on a vim built for real-world use.
+
+env:
+  global:
+    - BUILD_GIT_RAW="build/ditch-embedded-libgit2"
+  matrix:
+    - VIM_VER=""          VIM_PPA="ppa:jonathonf/vim"
+    - VIM_VER="master"    VIM_PPA=""
+
+before_script: |
+  set -ex
+
+  git clone --depth=1 https://github.com/junegunn/vader.vim.git
+
+  if [ "x$BUILD_GIT_RAW" != "x" ]; then
+    git clone --depth=1 --branch=$BUILD_GIT_RAW https://github.com/rsrchboy/p5-Git-Raw.git
+    cpanm -q --sudo ./p5-Git-Raw || cat $HOME/.cpanm/build.log
+  else
+    cpanm -q --sudo Git::Raw
+  fi
+
+  if [ "x$VIM_VER" != "x" ]; then
+    git clone --depth=1 https://github.com/vim/vim.git --branch $VIM_VER
+    cd vim
+    ./configure --enable-perlinterp=yes
+    make -j4
+    sudo make install
+    cd ..
+  elif [ "x$VIM_PPA" != "x" ] ; then
+    sudo apt-add-repository --yes $VIM_PPA
+    sudo apt-get -q update
+    sudo apt-get -y install vim-nox
+  else
+    echo "Using stock vim!"
+  fi
+
+  perl -V
+
+  vim --version
+
+script: |
+  test/run.sh

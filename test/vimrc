@@ -1,0 +1,4 @@
+set nomore
+set rtp+=vader.vim
+set rtp+=vim-ducttape
+set rtp+=.

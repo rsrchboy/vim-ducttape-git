@@ -1,0 +1,2 @@
+Execute:
+  Assert g:ducttape#git#loaded, 1
