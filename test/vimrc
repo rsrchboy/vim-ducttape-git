@@ -1,4 +1,5 @@
 set nomore
-set rtp+=vader.vim
-set rtp+=vim-ducttape
+set rtp-=~/.vim,~/.vim/after
 set rtp+=.
+set packpath-=~/.vim
+set packpath+=.
