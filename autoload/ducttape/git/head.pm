@@ -13,11 +13,6 @@ use Git::Raw::Repository;
 use Git::Raw::Signature;
 use Path::Tiny;
 
-# use ducttape::git;
-
-# debugging...
-use Smart::Comments '###';
-
 sub bufrepo { goto \&VIMx::autoload::ducttape::git::bufrepo }
 
 function subject        => sub { bufrepo->head->peel('commit')->summary };

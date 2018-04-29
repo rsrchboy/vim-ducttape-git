@@ -8,8 +8,6 @@ use VIMx::Symbiont;
 use Git::Raw;
 use Git::Raw::Repository;
 
-use Smart::Comments;
-
 sub bufrepo {
     # FIXME ARRGH
     return Git::Raw::Repository->open($b{git_dir});
